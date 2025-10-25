@@ -1,0 +1,77 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_newName",
+						"type": "string"
+					}
+				],
+				"name": "changeName",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "plantName",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/LearnString.sol": "LearnString"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/LearnString.sol": {
+			"keccak256": "0xbdba4592a18f9ded11c5e4cf0d1321a77b71c1c21d3138cb67eabbe03813c26e",
+			"license": "MIT (wajib agar mengetahui project open source)",
+			"urls": [
+				"bzz-raw://657c148268d0c3df41b3cc33b37b2dd3ee2d22e0fb9b4f5aa87631da0684845b",
+				"dweb:/ipfs/QmNf8Ah8yBW3wrNsKcat9cJUb3Zi7PqNEnhdGF24nXhqPP"
+			]
+		}
+	},
+	"version": 1
+}
