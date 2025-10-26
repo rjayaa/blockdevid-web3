@@ -1,8 +1,7 @@
-// SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
 contract LiskGarden {
-
     // ============================================
     // BAGIAN 1: ENUM & STRUCT
     // ============================================
@@ -10,7 +9,12 @@ contract LiskGarden {
     // SEED, SPROUT, GROWING, BLOOMING
     // Hint: enum GrowthStage { SEED, SPROUT, GROWING, BLOOMING }
 
-    enum GrowthStage { SEED, SPROUT, GROWING, BLOOMING }
+    enum GrowthStage {
+        SEED,
+        SPROUT,
+        GROWING,
+        BLOOMING
+    }
 
     // TODO 1.2: Buat struct Plant dengan 8 fields:
     // - uint256 id
@@ -31,8 +35,6 @@ contract LiskGarden {
         bool exists;
         bool isDead;
     }
-        
-
 
     // ============================================
     // BAGIAN 2: STATE VARIABLES
@@ -68,8 +70,7 @@ contract LiskGarden {
     uint256 public constant STAGE_DURATION = 1 minutes;
 
     // TODO 3.4: Waktu deplesi air = 30 detik
-    
-
+    uint256 public constant WATER_DEPLETION_TIME = 30 seconds;
     // TODO 3.5: Rate deplesi = 2 (2% setiap interval)
     // Hint: uint8 public constant WATER_DEPLETION_RATE = 2;
     uint256 public constant WATER_DEPLETION_RATE = 2;
@@ -78,19 +79,20 @@ contract LiskGarden {
     // BAGIAN 4: EVENTS
     // ============================================
     // TODO 4.1: Event PlantSeeded(address indexed owner, uint256 indexed plantId)
-     event PlantSeeded(address indexed owner, uint256 indexed plantId);
-
+    event PlantSeeded(address indexed owner, uint256 indexed plantId);
 
     // TODO 4.2: Event PlantWatered(uint256 indexed plantId, uint8 newWaterLevel)
     event PlantWatered(uint256 indexed plantId, uint8 newWaterLevel);
 
     // TODO 4.3: Event PlantHarvested(uint256 indexed plantId, address indexed owner, uint256 reward)
-    event PlantHarvested(uint256 indexed plantId, address indexed owner, uint256 reward);
+    event PlantHarvested(
+        uint256 indexed plantId,
+        address indexed owner,
+        uint256 reward
+    );
 
     // TODO 4.4: Event StageAdvanced(uint256 indexed plantId, GrowthStage newStage)
     event StageAdvanced(uint256 indexed plantId, GrowthStage newStage);
-
-
 
     // TODO 4.5: Event PlantDied(uint256 indexed plantId)
     event PlantDied(uint256 indexed plantId);
@@ -118,20 +120,18 @@ contract LiskGarden {
     // 7. Return plantId
 
     function deposit() external payable {
-    // Tidak perlu code apapun!
-    // Cukup terima ETH dan masuk ke balance contract
-}
-
- 
+        // Tidak perlu code apapun!
+        // Cukup terima ETH dan masuk ke balance contract
+    }
 
     function plantSeed() external payable returns (uint256) {
         // TODO: Implement fungsi ini
         // Hint: Lihat spesifikasi di atas!
-         require(msg.value >= PLANT_PRICE, "Tidak cukup ETH");
-        
+        require(msg.value >= PLANT_PRICE, "Tidak cukup ETH");
+
         plantCounter++;
-        
-        plants[plantCounter] = Plant ({
+
+        plants[plantCounter] = Plant({
             id: plantCounter,
             owner: msg.sender,
             stage: GrowthStage.SEED,
@@ -146,9 +146,7 @@ contract LiskGarden {
 
         emit PlantSeeded(msg.sender, plantCounter);
 
-
         return plantCounter;
-
     }
 
     // ============================================
@@ -166,27 +164,21 @@ contract LiskGarden {
     // 7. Return waterLevel - waterLost
 
     function calculateWaterLevel(uint256 _plantId) public view returns (uint8) {
-        // TODO: Implement  
+        // TODO: Implement
         Plant storage plant = plants[_plantId];
 
-        if(plant.exists == false || plant.isDead == true){
+        if (!plant.exists || plant.isDead) {
             return 0;
         }
         uint256 timeSinceWatered = block.timestamp - plant.lastWatered;
-        uint256 depletionIntervals = timeSinceWatered / WATER_DEPLETION_RATE;
+        uint256 depletionIntervals = timeSinceWatered / WATER_DEPLETION_TIME;
         uint256 waterLost = depletionIntervals * WATER_DEPLETION_RATE;
-        
 
-        if(waterLost >= plant.waterLevel){
+        if (waterLost >= uint256(plant.waterLevel)) {
             return 0;
         }
 
-        return plant.waterLevel - uint8(waterLost);
-
-        
-
-
-
+        return uint8(uint256(plant.waterLevel) - waterLost);
     }
 
     // TODO 7.2: updateWaterLevel (internal)
@@ -201,7 +193,7 @@ contract LiskGarden {
         Plant storage plant = plants[_plantId];
         uint8 currentWater = calculateWaterLevel(_plantId);
         plant.waterLevel = currentWater;
-        if(currentWater == 0 && !plant.isDead){
+        if (currentWater == 0 && !plant.isDead) {
             plant.isDead = true;
             emit PlantDied(_plantId);
         }
@@ -227,20 +219,17 @@ contract LiskGarden {
         // 3. require !isDead
         require(plant.exists, "plant tidak ada");
         require(msg.sender == plant.owner, "Bukan Owner Woy");
-        require(!plant.isDead , "Plant koid");
-
+        require(!plant.isDead, "Plant koid");
 
         // 4. Set waterLevel = 100
         // 5. Set lastWatered = block.timestamp
         plant.waterLevel = 100;
         plant.lastWatered = block.timestamp;
 
-        
         // 6. Emit PlantWatered
         emit PlantWatered(_plantId, plant.waterLevel);
         // 7. Call updatePlantStage
         updatePlantStage(_plantId);
-
     }
 
     // ============================================
@@ -257,34 +246,45 @@ contract LiskGarden {
     // 6. Update stage berdasarkan waktu (3 if statements)
     // 7. Jika stage berubah, emit StageAdvanced
 
-    function updatePlantStage(uint256 plantId) public {
+    function updatePlantStage(uint256 _plantId) public {
         // TODO: Implement
-        Plant storage plant = plants[plantId];
+        Plant storage plant = plants[_plantId];
         // 1. require exists
-        require(plant.exists , "Plant gaada");
+        require(plant.exists, "Plant gaada");
         // 2. Call updateWaterLevel
-        updateWaterLevel(plantId);
+        updateWaterLevel(_plantId);
         // 3. Jika isDead, return
-        if(plant.isDead) return;
+        if (plant.isDead) return;
 
         // 4. Hitung timeSincePlanted
-        uint256 timeSincePlanted = plant.plantedDate - block.timestamp;
+        uint256 timeSincePlanted = block.timestamp - plant.plantedDate;
 
         // 5. Simpan oldStage
         GrowthStage oldStage = plant.stage;
-        
+
         // 6. Update stage berdasarkan waktu (3 if statements)
 
         // enum GrowthStage { SEED, SPROUT, GROWING, BLOOMING }
-        if(timeSincePlanted >= STAGE_DURATION * 3 && oldStage == GrowthStage.GROWING) plant.stage = GrowthStage.BLOOMING;
-        else if (timeSincePlanted >= STAGE_DURATION * 2 && oldStage == GrowthStage.SPROUT ) plant.stage = GrowthStage.GROWING;
-        else if(timeSincePlanted >= STAGE_DURATION * 1 && oldStage == GrowthStage.SEED) plant.stage = GrowthStage.SPROUT;
-        else plant.stage = GrowthStage.SEED;
-
-        GrowthStage newStage = plant.stage;
+        if (
+            timeSincePlanted >= STAGE_DURATION * 3 &&
+            plant.stage < GrowthStage.BLOOMING
+        ) {
+            plant.stage = GrowthStage.BLOOMING;
+        } else if (
+            timeSincePlanted >= STAGE_DURATION * 2 &&
+            plant.stage < GrowthStage.GROWING
+        ) {
+            plant.stage = GrowthStage.GROWING;
+        } else if (
+            timeSincePlanted >= STAGE_DURATION &&
+            plant.stage < GrowthStage.SPROUT
+        ) {
+            plant.stage = GrowthStage.SPROUT;
+        }
 
         // 7. Jika stage berubah, emit StageAdvanced
-        emit StageAdvanced(plantId, newStage);
+        if (plant.stage != oldStage) emit StageAdvanced(_plantId, plant.stage);
+        // emit StageAdvanced(plantId, newStage);
     }
 
     // TODO 8.2: harvestPlant (external)
@@ -301,14 +301,14 @@ contract LiskGarden {
 
     function harvestPlant(uint256 _plantId) external {
         // TODO: Implement
-    Plant storage plant = plants[_plantId];
-    require(plant.exists, "Plant tak ada");
-    require(msg.sender == plant.owner, "Bukan owner");
-    require(plant.isDead, "Taneman Mati");
-    updatePlantStage(_plantId);
-    require(plant.stage == GrowthStage.BLOOMING , "Belom mateng");
-    emit PlantHarvested(_plantId, owner, REWARD);
-    
+        Plant storage plant = plants[_plantId];
+        require(plant.exists, "Plant tak ada");
+        require(msg.sender == plant.owner, "Bukan owner");
+        require(!plant.isDead, "Taneman Mati");
+        updatePlantStage(_plantId);
+        require(plant.stage == GrowthStage.BLOOMING, "Belom mateng");
+        emit PlantHarvested(_plantId, owner, REWARD);
+
         (bool success, ) = msg.sender.call{value: REWARD}("");
         require(success, "Transfer gagal");
     }
@@ -317,13 +317,15 @@ contract LiskGarden {
     // HELPER FUNCTIONS (Sudah Lengkap)
     // ============================================
 
-    function getPlant(uint256 plantId) external view returns (Plant memory) {
-        Plant memory plant = plants[plantId];
-        plant.waterLevel = calculateWaterLevel(plantId);
+    function getPlant(uint256 _plantId) external view returns (Plant memory) {
+        Plant memory plant = plants[_plantId];
+        plant.waterLevel = calculateWaterLevel(_plantId);
         return plant;
     }
 
-    function getUserPlants(address user) external view returns (uint256[] memory) {
+    function getUserPlants(
+        address user
+    ) external view returns (uint256[] memory) {
         return userPlants[user];
     }
 
