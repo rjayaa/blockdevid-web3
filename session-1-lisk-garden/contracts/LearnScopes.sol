@@ -24,6 +24,7 @@ contract LearnScopes {
     // 3. LOCAL VARIABLES: Temporary dalam function
     function calculateAge(uint256 _plantedTime) public view returns (uint256) {
         // Local variable - hanya ada selama fungsi berjalan
+        // Local variable tidak kena gass fee
         uint256 currentTime = block.timestamp;
         uint256 age = currentTime - _plantedTime;
 
